@@ -40,4 +40,13 @@ public class Member {
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	@Override
+	public String toString() {
+		return "Member{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", age=" + age +
+				'}'; // toString 할때 team 은 지우는게 좋다. 만약 Member 와 Team 모두 toString 하면 무한 루프를 탄다.
+	}
 }
