@@ -40,23 +40,18 @@ public class Main {
 			em.flush();
 			em.clear();
 
-			String query1 = "select " +
-								  "case when m.age <= 10 then '학생요금' "+
-								  "      when m.age >= 60 then '경로요금' "+
-								  "      else '일반요금' " +
-							 	  "end " +
-					       "from Member m";
-			// 조건문
-			String query2 = "select coalesce(m.username, '아름 없는 회원') from Member m";
-			// 멤버 이름이 null 이면 이름 없는 회원으로 반환
-			String query3 = "select nullif(m.username, '관리자') from Member m";
-			// 사용자 이름이 '관리자' 이면 null 반환
-			List<String> result = em.createQuery(query3, String.class)
+//			String query1 = "select concat('a', 'b') from Member m";
+			String query1 = "select 'a' || 'b' from Member m"; // 하이버네이트에서 지원
+			String query2 = "select substring(m.username, 2, 3) from Member m";
+			String query3 = "select locate('de', 'abcdefg') from Member m"; // 'de' 가 있는지 있으면 인덱스 출력
+			String query4 = "select size(t.members) From Team t";
+			List<Integer> result = em.createQuery(query4, Integer.class)
 					.getResultList();
 
-			for (String s : result) {
+			for (Integer s : result) {
 				System.out.println("s = " + s);
 			}
+
 			tx.commit(); // 트랜잭션 종료
 		} catch (Exception e) {
 			// 뭔가 에러나 취소가 있으면 롤백
