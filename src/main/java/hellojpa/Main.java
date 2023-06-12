@@ -31,7 +31,7 @@ public class Main {
 			em.persist(team);
 
 			Member member = new Member();
-			member.setUsername("teamA");
+			member.setUsername("관리자");
 			member.setAge(10);
 			member.setTeam(team);
 			member.setType(MemberType.ADMIN);
@@ -40,21 +40,23 @@ public class Main {
 			em.flush();
 			em.clear();
 
-			String query1 = "select m.username, 'HELLO', TRUE from Member m " +
-					"where m.type = :userType";
-			//쌩으로 쓰면 where m.type = hellojpa.jpql.MemberType.ADMIN 다써야함
-
-			List<Object[]> list = em.createQuery(query1)
-					.setParameter("userType", MemberType.ADMIN) // 요렇게 하는걸 권장
+			String query1 = "select " +
+								  "case when m.age <= 10 then '학생요금' "+
+								  "      when m.age >= 60 then '경로요금' "+
+								  "      else '일반요금' " +
+							 	  "end " +
+					       "from Member m";
+			// 조건문
+			String query2 = "select coalesce(m.username, '아름 없는 회원') from Member m";
+			// 멤버 이름이 null 이면 이름 없는 회원으로 반환
+			String query3 = "select nullif(m.username, '관리자') from Member m";
+			// 사용자 이름이 '관리자' 이면 null 반환
+			List<String> result = em.createQuery(query3, String.class)
 					.getResultList();
-			// 여기서 team select 하는 쿼리는 LAZY 로 안해서 나감
 
-			for (Object[] objects : list) {
-				System.out.println("objects = " + objects[0]);
-				System.out.println("objects = " + objects[1]);
-				System.out.println("objects = " + objects[2]);
+			for (String s : result) {
+				System.out.println("s = " + s);
 			}
-			
 			tx.commit(); // 트랜잭션 종료
 		} catch (Exception e) {
 			// 뭔가 에러나 취소가 있으면 롤백
