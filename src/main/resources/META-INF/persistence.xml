@@ -14,7 +14,7 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.format_sql" value="true"/>
       <property name="hibernate.use_sql_comments" value="true"/>
-      <property name="hibernate.hbm2ddl.auto" value="update" />
+      <property name="hibernate.hbm2ddl.auto" value="create" />
       <!-- DDL 설정-->
 <!--      update 는 변경된걸 추가해줘, 그렇다고 삭제는 안함-->
 <!--      create 시작하고 다 drop 하고 재 시작-->
