@@ -38,16 +38,8 @@ public class Main {
 			em.flush();
 			em.clear();
 
-			// inner join 에서 inner 생략가능
-			String query1 = "select m from Member m join m.team t";
-			// left outer join 에서 outer 생략가능
-			String query2 = "select m from Member m left join m.team t";
-			// 세타 조인
-			String query3 = "select m from Member m, Team t where m.username = t.name";
-			// 조인 대상 필터링
-			String query4 = "select m from Member m left join m.team t on t.name = 'teamA'";
-			// 연관관계 없는 엔티티 외부 조인
-			String query5 = "select m from Member m left join Team t on m.username = t.name";
+			// from 절 서브 쿼리안됨
+//			String query5 = "select mm from (select m.age, m.username from Member m) as mm";
 
 			List<Member> result = em.createQuery(query5, Member.class)
 					.getResultList();
