@@ -26,29 +26,24 @@ public class Main {
 
 		try {
 
-			Team team = new Team();
-			team.setName("teamA");
-			em.persist(team);
+			Member member1 = new Member();
+			member1.setUsername("관리자1");
+			em.persist(member1);
 
-			Member member = new Member();
-			member.setUsername("관리자");
-			member.setAge(10);
-			member.setTeam(team);
-			member.setType(MemberType.ADMIN);
-			em.persist(member);
+			Member member2 = new Member();
+			member2.setUsername("관리자2");
+			em.persist(member2);
 
 			em.flush();
 			em.clear();
-
-//			String query1 = "select concat('a', 'b') from Member m";
-			String query1 = "select 'a' || 'b' from Member m"; // 하이버네이트에서 지원
-			String query2 = "select substring(m.username, 2, 3) from Member m";
-			String query3 = "select locate('de', 'abcdefg') from Member m"; // 'de' 가 있는지 있으면 인덱스 출력
-			String query4 = "select size(t.members) From Team t";
-			List<Integer> result = em.createQuery(query4, Integer.class)
+			String query1 = "select m.username from Member m"; // 상태 필드 경로탐색의 끝
+			String query2 = "select m.team from Member m"; // 묵시적 내부 조인이 일어남 = 단일값 연관 경로
+			// 참고로 묵시적 내부 조인이 일어나게 쿼리를 짜면 안된다. 쿼리 튜닝할때 힘들어짐
+			String query3 = "select t.members from Team t"; // 컬렉션 값 연관경로, 묵시적 내부 조인 발생, 컬렉션이기때문에 더이상 탐색 불가
+			List<Member> result = em.createQuery(query3, Member.class)
 					.getResultList();
 
-			for (Integer s : result) {
+			for (Member s : result) {
 				System.out.println("s = " + s);
 			}
 
