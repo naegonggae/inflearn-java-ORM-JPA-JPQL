@@ -51,25 +51,15 @@ public class Main {
 
 			em.flush();
 			em.clear();
-			String query1 = "select distinct t from Team t join fetch t.members";
-			// 패치조인은 별칭을 줄 수 없다. -> join fetch t.members m 이렇게
-			String query2 = "select t from Team t";
-			// N+1 문제를 패치조인이나 배치사이즈를 통해 해결가능하다.
-			// 배치 사이즈하면 원래 team을 조회하고 멤버 수만큼 멤버를 계속 조회하는데 멤버를 조회할때 아이디 값을 다 가져와서 한번에 조회할수있다.
+			String query1 = "select m from Member m where m = :member";
+			String query2 = "select m from Member m where m.id = :memberId";
+			// 이렇게 해도 같은 값을 출력하고 where 에서 member0_.id=? 조회한다.
 
-			List<Team> result = em.createQuery(query2, Team.class)
-					.setFirstResult(0)
-					.setMaxResults(2)
-					.getResultList();
+			Member findMember = em.createQuery(query1, Member.class)
+					.setParameter("member", member1)
+					.getSingleResult();
 
-			System.out.println("result = " + result.size());
-
-			for (Team team : result) {
-				System.out.println("team = " + team.getName() +", "+ team.getMembers().size());
-				// 데이터 뻥튀기 된다. 일대다가 그럼 / 다대일은 뻥튀기 걱정없음
-				// 팀은 A랑 B 이렇게 두개밖에 없지만 팀A에 해당하는 멤버가 두명이기때문에 db에 들어갈때는
-				// 팀A-회원1 / 팀A-회원2 / 팀B-회원3 해서 3개가 된다는 말이다.
- 			}
+			System.out.println("findMember = " + findMember);
 
 			tx.commit(); // 트랜잭션 종료
 		} catch (Exception e) {
