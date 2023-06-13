@@ -26,25 +26,47 @@ public class Main {
 
 		try {
 
+			Team teamA = new Team();
+			teamA.setName("teamA");
+			em.persist(teamA);
+
+			Team teamB = new Team();
+			teamB.setName("teamB");
+			em.persist(teamB);
+
 			Member member1 = new Member();
-			member1.setUsername("관리자1");
+			member1.setUsername("회원1");
+			member1.setTeam(teamA);
 			em.persist(member1);
 
 			Member member2 = new Member();
-			member2.setUsername("관리자2");
+			member2.setUsername("회원2");
+			member2.setTeam(teamA);
 			em.persist(member2);
+
+			Member member3 = new Member();
+			member3.setUsername("회원3");
+			member3.setTeam(teamB);
+			em.persist(member3);
 
 			em.flush();
 			em.clear();
-			String query1 = "select m.username from Member m"; // 상태 필드 경로탐색의 끝
-			String query2 = "select m.team from Member m"; // 묵시적 내부 조인이 일어남 = 단일값 연관 경로
-			// 참고로 묵시적 내부 조인이 일어나게 쿼리를 짜면 안된다. 쿼리 튜닝할때 힘들어짐
-			String query3 = "select t.members from Team t"; // 컬렉션 값 연관경로, 묵시적 내부 조인 발생, 컬렉션이기때문에 더이상 탐색 불가
-			List<Member> result = em.createQuery(query3, Member.class)
+			String query1 = "select m from Member m";
+			// 여기는 Team 이 프록시로 담겨서 온다.
+			String query2 = "select m from Member m join fetch m.team";
+			// 이렇게하면 Team 은 프록시로 담기지 않고 실제 데이터로 담겨온다.
+			// join 앞에 left 붙이면 outer 조인
+			// 실무에서 엄청 쓴다고 함
+			List<Member> result = em.createQuery(query2, Member.class)
 					.getResultList();
 
-			for (Member s : result) {
-				System.out.println("s = " + s);
+			for (Member member : result) {
+				System.out.println("member = " + member.getUsername() +", "+ member.getTeam().getName());
+				// 회원1, 팀A(SQL)
+				// 회원2, 팀A(1차 캐시)
+				// 회원3, 팀B(SQL)
+				// select 문이 최초 member 하나, 팀A 가져올때 하나, 팀B 가져올때 하나 해서 세번 출력됐다.
+				// 만약 회원 100명이라면 -> N + 1
 			}
 
 			tx.commit(); // 트랜잭션 종료
