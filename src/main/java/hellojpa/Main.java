@@ -51,15 +51,14 @@ public class Main {
 
 			em.flush();
 			em.clear();
-			String query1 = "select m from Member m where m = :member";
-			String query2 = "select m from Member m where m.id = :memberId";
-			// 이렇게 해도 같은 값을 출력하고 where 에서 member0_.id=? 조회한다.
 
-			Member findMember = em.createQuery(query1, Member.class)
-					.setParameter("member", member1)
-					.getSingleResult();
+			List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+					.setParameter("username", "회원1")
+					.getResultList();
 
-			System.out.println("findMember = " + findMember);
+			for (Member member : resultList) {
+				System.out.println("member = " + member);
+			}
 
 			tx.commit(); // 트랜잭션 종료
 		} catch (Exception e) {
@@ -72,3 +71,8 @@ public class Main {
 		emf.close();
 	}
 }
+
+// 오류3가지
+// 컴파일 오류 -> 제일 좋음
+// 로딩중 런타임 오류
+// 실행자가 버튼 눌렀을때 나는 오류 -> 이게 제일 안좋음

@@ -8,8 +8,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 
 @Entity
+@NamedQuery(
+		name = "Member.findByUsername",
+		query = "select m from Member m where m.username =:username"
+		// 오류검증을 해준다.
+		// 실무에서 이렇게 쓰진않아 대신 jpa 사용하고 레파지토리에 @Query 어노테이션 사용함
+)
 public class Member {
 	@Id @GeneratedValue
 	private Long id;
