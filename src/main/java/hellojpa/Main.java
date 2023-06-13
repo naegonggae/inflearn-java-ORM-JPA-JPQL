@@ -51,18 +51,18 @@ public class Main {
 
 			em.flush();
 			em.clear();
-			String query1 = "select m from Member m";
-			// 여기는 Team 이 프록시로 담겨서 온다.
-			String query2 = "select distinct t from Team t join fetch t.members";
-			// distinct 는 중복되는 엔티티를 제거 해줌 -> 데이터 뻥튀기를 안하고 싶다하면 사용
-			// 이렇게하면 Team 은 프록시로 담기지 않고 실제 데이터로 담겨온다.
-			// join 앞에 left 붙이면 outer 조인
-			// 실무에서 엄청 쓴다고 함
-			String query3 = "select t from Team t join t.members m";
-			// 초기에 팀정보만 불러옴 그다음 멤버 정보 불러오고 함
-			// 일반조인과 패치 조인의 차이
-			List<Team> result = em.createQuery(query3, Team.class)
+			String query1 = "select distinct t from Team t join fetch t.members";
+			// 패치조인은 별칭을 줄 수 없다. -> join fetch t.members m 이렇게
+			String query2 = "select t from Team t";
+			// N+1 문제를 패치조인이나 배치사이즈를 통해 해결가능하다.
+			// 배치 사이즈하면 원래 team을 조회하고 멤버 수만큼 멤버를 계속 조회하는데 멤버를 조회할때 아이디 값을 다 가져와서 한번에 조회할수있다.
+
+			List<Team> result = em.createQuery(query2, Team.class)
+					.setFirstResult(0)
+					.setMaxResults(2)
 					.getResultList();
+
+			System.out.println("result = " + result.size());
 
 			for (Team team : result) {
 				System.out.println("team = " + team.getName() +", "+ team.getMembers().size());

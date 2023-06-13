@@ -6,6 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import org.hibernate.annotations.BatchSize;
 
 @Entity
 public class Team {
@@ -14,6 +15,7 @@ public class Team {
 	private Long id;
 	private String name;
 
+	//@BatchSize(size = 100) // 일대다 페이징하려고
 	@OneToMany(mappedBy = "team")
 	private List<Member> members = new ArrayList<>();
 
